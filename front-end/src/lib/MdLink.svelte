@@ -1,10 +1,8 @@
 <script>
-    export let href = "";
-    export let title = "";
-    export let text = "";
+    let { href = "", title = "", children } = $props();
 </script>
 
-<a target="_blank" rel="noreferrer" {href} {title}>{text}</a>
+<a target="_blank" rel="noreferrer" {href} {title}>{@render children?.()}</a>
 
 <style>
     a {

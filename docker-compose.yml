@@ -24,14 +24,15 @@ services:
       dockerfile: pull_model.Dockerfile
     environment:
       - OLLAMA_BASE_URL=${OLLAMA_BASE_URL-http://host.docker.internal:11434}
-      - LLM=${LLM-llama2}
+      - LLM=${LLM-llama3.2}
+      - EMBEDDING_MODEL=${EMBEDDING_MODEL-sentence_transformer}
     networks:
       - net
     tty: true
 
   database:
     user: neo4j:neo4j
-    image: neo4j:5.11
+    image: neo4j:5.26
     ports:
       - 7687:7687
       - 7474:7474
@@ -103,9 +104,10 @@ services:
       - NEO4J_PASSWORD=${NEO4J_PASSWORD-password}
       - NEO4J_USERNAME=${NEO4J_USERNAME-neo4j}
       - OPENAI_API_KEY=${OPENAI_API_KEY-}      
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY-}
       - GOOGLE_API_KEY=${GOOGLE_API_KEY-}
       - OLLAMA_BASE_URL=${OLLAMA_BASE_URL-http://host.docker.internal:11434}
-      - LLM=${LLM-llama2}
+      - LLM=${LLM-llama3.2}
       - EMBEDDING_MODEL=${EMBEDDING_MODEL-sentence_transformer}
       - LANGCHAIN_ENDPOINT=${LANGCHAIN_ENDPOINT-"https://api.smith.langchain.com"}
       - LANGCHAIN_TRACING_V2=${LANGCHAIN_TRACING_V2-false}
@@ -142,9 +144,10 @@ services:
       - NEO4J_PASSWORD=${NEO4J_PASSWORD-password}
       - NEO4J_USERNAME=${NEO4J_USERNAME-neo4j}
       - OPENAI_API_KEY=${OPENAI_API_KEY-}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY-}
       - GOOGLE_API_KEY=${GOOGLE_API_KEY-}
       - OLLAMA_BASE_URL=${OLLAMA_BASE_URL-http://host.docker.internal:11434}
-      - LLM=${LLM-llama2}
+      - LLM=${LLM-llama3.2}
       - EMBEDDING_MODEL=${EMBEDDING_MODEL-sentence_transformer}
       - LANGCHAIN_ENDPOINT=${LANGCHAIN_ENDPOINT-"https://api.smith.langchain.com"}
       - LANGCHAIN_TRACING_V2=${LANGCHAIN_TRACING_V2-false}
@@ -183,9 +186,10 @@ services:
       - NEO4J_PASSWORD=${NEO4J_PASSWORD-password}
       - NEO4J_USERNAME=${NEO4J_USERNAME-neo4j}
       - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY-}
       - GOOGLE_API_KEY=${GOOGLE_API_KEY}  
       - OLLAMA_BASE_URL=${OLLAMA_BASE_URL-http://host.docker.internal:11434}
-      - LLM=${LLM-llama2}
+      - LLM=${LLM-llama3.2}
       - EMBEDDING_MODEL=${EMBEDDING_MODEL-sentence_transformer}
       - LANGCHAIN_ENDPOINT=${LANGCHAIN_ENDPOINT-"https://api.smith.langchain.com"}
       - LANGCHAIN_TRACING_V2=${LANGCHAIN_TRACING_V2-false}
@@ -213,7 +217,7 @@ services:
     ports:
       - 8504:8504
     healthcheck:
-      test: ["CMD-SHELL", "wget --no-verbose --tries=1 http://localhost:8504/ || exit 1"]
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8504/')"]
       interval: 5s
       timeout: 3s
       retries: 5

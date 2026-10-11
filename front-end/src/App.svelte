@@ -1,6 +1,6 @@
 <script>
     import { tick } from "svelte";
-    import SvelteMarkdown from "svelte-markdown";
+    import SvelteMarkdown from "@humanspeak/svelte-markdown";
     import botImage from "./assets/images/bot.jpeg";
     import meImage from "./assets/images/me.jpeg";
     import MdLink from "./lib/MdLink.svelte";
@@ -44,7 +44,7 @@
     // send();
 </script>
 
-<main class="h-full text-sm bg-gradient-to-t from-indigo-100 bg-fixed overflow-hidden">
+<main class="h-full text-sm bg-linear-to-t from-indigo-100 bg-fixed overflow-hidden">
     <div on:scroll={scrolling} class="flex h-full flex-col py-12 overflow-y-auto" use:scrollToBottom={$chatStore}>
         <div class="w-4/5 mx-auto flex flex-col mb-32">
             {#each $chatStore.data as message (message.id)}
@@ -59,15 +59,15 @@
                                 aria-label="Generate a new internal ticket from this question"
                                 title="Generate a new internal ticket from this question"
                                 on:click={() => generateTicket(message.text)}
-                                class="w-6 h-6 flex flex-col justify-center items-center border rounded border-indigo-200"
+                                class="w-6 h-6 flex flex-col justify-center items-center border rounded-sm border-indigo-200"
                                 ><External --color="#ccc" --hover-color="#999" /></button
                             >
                         {/if}
                         <div
                             class:ml-auto={message.from === "me"}
-                            class="relative w-12 h-12 border border-indigo-200 rounded flex justify-center items-center overflow-hidden"
+                            class="relative w-12 h-12 border border-indigo-200 rounded-sm flex justify-center items-center overflow-hidden"
                         >
-                            <img src={senderImages[message.from]} alt="" class="rounded-sm" />
+                            <img src={senderImages[message.from]} alt="" class="rounded-xs" />
                         </div>
                         {#if message.from === "bot"}
                             <div class="text-sm">
@@ -97,7 +97,7 @@
                     <input
                         placeholder="What coding related question can I help you with?"
                         disabled={$chatStore.state === chatStates.RECEIVING}
-                        class="text-lg w-full bg-white focus:outline-none px-4"
+                        class="text-lg w-full bg-white focus:outline-hidden px-4"
                         bind:value={question}
                         bind:this={input}
                         type="text"
@@ -112,6 +112,8 @@
 {/if}
 
 <style>
+    @reference "./app.css";
+
     :global(pre) {
         @apply bg-gray-100 rounded-lg p-4 border border-indigo-200;
     }
