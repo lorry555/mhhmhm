@@ -24,15 +24,15 @@ I won't cover the activation of WSL procedure which you will find very easy on i
 
 After the activation enter into the WSL with the command `wsl` and type `docker`.
 
-2. Install ollama on WSL using https://github.com/jmorganca/ollama (avec la commande `curl https://ollama.ai/install.sh | sh`)
+2. Install ollama on WSL using https://github.com/ollama/ollama (avec la commande `curl -fsSL https://ollama.com/install.sh | sh`)
     - The script have been downloaded in `./install_ollama.sh` and you do the smae thing with `sh ./install_ollama.sh`
     - To list the downloaded model: `ollama list`. This command could lead to:
     ```sh
     NAME            ID              SIZE    MODIFIED       
-    llama2:latest   7da22eda89ac    3.8 GB  22 minutes ago
+    llama3.2:latest a80c4f17acd5    2.0 GB  22 minutes ago
     ```
-    - (OPTIONAL) To remove model: `ollama rm llama2`
-    - To run the ollama on WSL: `ollama run llama2`
+    - (OPTIONAL) To remove model: `ollama rm llama3.2`
+    - To run the ollama on WSL: `ollama run llama3.2`
 
 3. clone the repo
 4. cd into the repo and enter wsl

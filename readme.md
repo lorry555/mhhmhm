@@ -14,24 +14,34 @@ Available variables:
 | NEO4J_URI              | neo4j://database:7687              | REQUIRED - URL to Neo4j database                                        |
 | NEO4J_USERNAME         | neo4j                              | REQUIRED - Username for Neo4j database                                  |
 | NEO4J_PASSWORD         | password                           | REQUIRED - Password for Neo4j database                                  |
-| LLM                    | llama2                             | REQUIRED - Can be any Ollama model tag, or gpt-4 or gpt-3.5 or claudev2 |
-| EMBEDDING_MODEL        | sentence_transformer               | REQUIRED - Can be sentence_transformer, openai, aws, ollama or google-genai-embedding-001|
-| AWS_ACCESS_KEY_ID      |                                    | REQUIRED - Only if LLM=claudev2 or embedding_model=aws                  |
-| AWS_SECRET_ACCESS_KEY  |                                    | REQUIRED - Only if LLM=claudev2 or embedding_model=aws                  |
-| AWS_DEFAULT_REGION     |                                    | REQUIRED - Only if LLM=claudev2 or embedding_model=aws                  |
-| OPENAI_API_KEY         |                                    | REQUIRED - Only if LLM=gpt-4 or LLM=gpt-3.5 or embedding_model=openai   |
-| GOOGLE_API_KEY         |                                    | REQUIRED - Only required when using GoogleGenai LLM or embedding model google-genai-embedding-001|
+| LLM                    | llama3.2                           | REQUIRED - Any Ollama model tag, or a hosted model name: `gpt-...` (OpenAI), `claude-...` (Anthropic), `gemini-...` (Google) or `bedrock:<model id>` (AWS Bedrock) |
+| EMBEDDING_MODEL        | sentence_transformer               | REQUIRED - Can be sentence_transformer, openai, aws, ollama or google-genai |
+| AWS_ACCESS_KEY_ID      |                                    | REQUIRED - Only if LLM=bedrock:... or EMBEDDING_MODEL=aws               |
+| AWS_SECRET_ACCESS_KEY  |                                    | REQUIRED - Only if LLM=bedrock:... or EMBEDDING_MODEL=aws               |
+| AWS_DEFAULT_REGION     |                                    | REQUIRED - Only if LLM=bedrock:... or EMBEDDING_MODEL=aws               |
+| OPENAI_API_KEY         |                                    | REQUIRED - Only if LLM=gpt-... or EMBEDDING_MODEL=openai                |
+| ANTHROPIC_API_KEY      |                                    | REQUIRED - Only if LLM=claude-...                                       |
+| GOOGLE_API_KEY         |                                    | REQUIRED - Only if LLM=gemini-... or EMBEDDING_MODEL=google-genai       |
 | LANGCHAIN_ENDPOINT     | "https://api.smith.langchain.com"  | OPTIONAL - URL to Langchain Smith API                                   |
 | LANGCHAIN_TRACING_V2   | false                              | OPTIONAL - Enable Langchain tracing v2                                  |
 | LANGCHAIN_PROJECT      |                                    | OPTIONAL - Langchain project name                                       |
 | LANGCHAIN_API_KEY      |                                    | OPTIONAL - Langchain API key                                            |
 
 ## LLM Configuration
-MacOS and Linux users can use any LLM that's available via Ollama. Check the "tags" section under the model page you want to use on https://ollama.ai/library and write the tag for the value of the environment variable `LLM=` in the `.env` file.
-All platforms can use GPT-3.5-turbo and GPT-4 (bring your own API keys for OpenAI models).
+MacOS and Linux users can use any LLM that's available via Ollama. Check the "tags" section under the model page you want to use on https://ollama.com/library and write the tag for the value of the environment variable `LLM=` in the `.env` file.
+
+All platforms can use hosted models instead (bring your own API key). The start of the `LLM` value picks the provider:
+
+| `LLM` value | Provider | Example |
+|---|---|---|
+| `gpt-...` | OpenAI (`OPENAI_API_KEY`) | `LLM=gpt-6-luna` |
+| `claude-...` | Anthropic (`ANTHROPIC_API_KEY`) | `LLM=claude-opus-5-5` |
+| `gemini-...` | Google Gemini (`GOOGLE_API_KEY`) | `LLM=gemini-3.7-flash` |
+| `bedrock:<model id>` | AWS Bedrock (`AWS_*` variables) | `LLM=bedrock:us.anthropic.claude-opus-5-5` |
+| anything else | Ollama model tag | `LLM=llama3.2` |
 
 **MacOS**
-Install [Ollama](https://ollama.ai) on MacOS and start it before running `docker compose up` using `ollama serve` in a separate terminal.
+Install [Ollama](https://ollama.com) on MacOS and start it before running `docker compose up` using `ollama serve` in a separate terminal.
 
 **Linux**
 No need to install Ollama manually, it will run in a container as
@@ -41,7 +51,21 @@ Make sure to set the `OLLAMA_BASE_URL=http://llm:11434` in the `.env` file when 
 To use the Linux-GPU profile: run `docker compose --profile linux-gpu up`. Also change `OLLAMA_BASE_URL=http://llm-gpu:11434` in the `.env` file.
 
 **Windows**
-Ollama now supports Windows. Install [Ollama](https://ollama.ai) on Windows and start it before running `docker compose up` using `ollama serve` in a separate terminal. Alternatively, Windows users can generate an OpenAI API key and configure the stack to use `gpt-3.5` or `gpt-4` in the `.env` file.
+Ollama now supports Windows. Install [Ollama](https://ollama.com) on Windows and start it before running `docker compose up` using `ollama serve` in a separate terminal. Alternatively, Windows users can use one of the hosted models from the table above.
+
+## Embedding model
+`EMBEDDING_MODEL` picks the model used to embed questions, answers and PDF chunks:
+
+| `EMBEDDING_MODEL` | Model | Dimensions |
+|---|---|---|
+| `sentence_transformer` | `all-MiniLM-L6-v2`, runs locally | 384 |
+| `ollama` | `nomic-embed-text` (pulled automatically) | 768 |
+| `openai` | `text-embedding-3-small` | 1536 |
+| `aws` | `amazon.titan-embed-text-v2:0` | 1024 |
+| `google-genai` | `gemini-embedding-2` | 768 |
+
+Stored embeddings only work with the model that created them. If you switch `EMBEDDING_MODEL`, or upgrade from an older version of this stack, delete the `data/` folder (or the `stackoverflow`, `top_answers` and `pdf_bot` vector indexes) and import your data again.
+
 # Develop
 
 > [!WARNING]

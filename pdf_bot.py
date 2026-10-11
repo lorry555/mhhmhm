@@ -1,16 +1,17 @@
 import os
 
 import streamlit as st
-from langchain.chains import RetrievalQA
-from PyPDF2 import PdfReader
-from langchain.callbacks.base import BaseCallbackHandler
-from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain_community.vectorstores import Neo4jVector
+from langchain_classic.chains import RetrievalQA
+from pypdf import PdfReader
+from langchain_core.callbacks import BaseCallbackHandler
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain_neo4j import Neo4jVector
 from streamlit.logger import get_logger
 from chains import (
     load_embedding_model,
     load_llm,
 )
+from utils import token_text
 
 # load api key lib
 from dotenv import load_dotenv
@@ -40,8 +41,8 @@ class StreamHandler(BaseCallbackHandler):
         self.container = container
         self.text = initial_text
 
-    def on_llm_new_token(self, token: str, **kwargs) -> None:
-        self.text += token
+    def on_llm_new_token(self, token, **kwargs) -> None:
+        self.text += token_text(token)
         self.container.markdown(self.text)
 
 
@@ -88,7 +89,7 @@ def main():
 
         if query:
             stream_handler = StreamHandler(st.empty())
-            qa.run(query, callbacks=[stream_handler])
+            qa.invoke({"query": query}, config={"callbacks": [stream_handler]})
 
 
 if __name__ == "__main__":

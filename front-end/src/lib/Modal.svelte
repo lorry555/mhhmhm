@@ -20,7 +20,7 @@
 
 <dialog
     bind:this={modal}
-    class="inset-0 w-full md:w-1/2 h-1/2 p-4 rounded-lg border border-indigo-200 shadow-lg relative"
+    class="inset-0 m-auto w-full md:w-1/2 h-1/2 p-4 rounded-lg border border-indigo-200 shadow-lg relative"
 >
     <form class="flex flex-col justify-between h-full" method="dialog">
         <div class="flex flex-col">
@@ -34,14 +34,14 @@
             <div class="mt-8">
                 <label class="block pl-2"
                     >Body <br />
-                    <textarea class="border rounded-sm w-full h-64 p-2" value={$generationStore.data.text} /></label
+                    <textarea class="border rounded-xs w-full h-64 p-2" value={$generationStore.data.text}></textarea></label
                 >
             </div>
         </div>
         <button type="submit" class="bg-indigo-500 text-white rounded-lg px-4 py-2">Submit</button>
     </form>
     {#if $generationStore.state === generationStates.LOADING}
-        <div class="absolute inset-0 bg-indigo-100 bg-opacity-90 flex justify-center items-center">
+        <div class="absolute inset-0 bg-indigo-100/90 flex justify-center items-center">
             Generating title and question body...
         </div>
     {/if}
@@ -51,8 +51,10 @@
 </dialog>
 
 <style>
+    @reference "../app.css";
+
     dialog::backdrop {
-        @apply bg-gradient-to-t from-white to-indigo-500;
+        @apply bg-linear-to-t from-white to-indigo-500;
         opacity: 0.75;
     }
 </style>

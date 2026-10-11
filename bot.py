@@ -2,11 +2,12 @@ import os
 
 import streamlit as st
 from streamlit.logger import get_logger
-from langchain.callbacks.base import BaseCallbackHandler
-from langchain_community.graphs import Neo4jGraph
+from langchain_core.callbacks import BaseCallbackHandler
+from langchain_neo4j import Neo4jGraph
 from dotenv import load_dotenv
 from utils import (
     create_vector_index,
+    token_text,
 )
 from chains import (
     load_embedding_model,
@@ -42,8 +43,8 @@ class StreamHandler(BaseCallbackHandler):
         self.container = container
         self.text = initial_text
 
-    def on_llm_new_token(self, token: str, **kwargs) -> None:
-        self.text += token
+    def on_llm_new_token(self, token, **kwargs) -> None:
+        self.text += token_text(token)
         self.container.markdown(self.text)
 
 
@@ -64,8 +65,9 @@ styl = f"""
       background: white;
       z-index: 101;
     }}
-    .stChatFloatingInputContainer {{
-        bottom: 20px;
+    /* leave room below the chat input for the RAG mode selector */
+    [data-testid="stBottomBlockContainer"] {{
+        padding-bottom: 100px;
     }}
 
     /* Generate ticket text area */

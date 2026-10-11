@@ -1,10 +1,11 @@
 import os
 
-from langchain_community.graphs import Neo4jGraph
+from langchain_neo4j import Neo4jGraph
 from dotenv import load_dotenv
 from utils import (
     create_vector_index,
     BaseLogger,
+    token_text,
 )
 from chains import (
     load_embedding_model,
@@ -15,7 +16,7 @@ from chains import (
 )
 from fastapi import FastAPI, Depends
 from pydantic import BaseModel
-from langchain.callbacks.base import BaseCallbackHandler
+from langchain_core.callbacks import BaseCallbackHandler
 from threading import Thread
 from queue import Queue, Empty
 from collections.abc import Generator
@@ -60,8 +61,8 @@ class QueueCallback(BaseCallbackHandler):
     def __init__(self, q):
         self.q = q
 
-    def on_llm_new_token(self, token: str, **kwargs) -> None:
-        self.q.put(token)
+    def on_llm_new_token(self, token, **kwargs) -> None:
+        self.q.put(token_text(token))
 
     def on_llm_end(self, *args, **kwargs) -> None:
         return self.q.empty()

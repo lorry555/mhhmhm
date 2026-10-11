@@ -3,6 +3,17 @@ class BaseLogger:
         self.info = print
 
 
+def token_text(token) -> str:
+    # Most models stream str tokens, but some (e.g. Claude with thinking) stream lists of content blocks
+    if isinstance(token, str):
+        return token
+    return "".join(
+        block if isinstance(block, str) else block.get("text", "")
+        for block in token
+        if isinstance(block, str) or block.get("type") == "text"
+    )
+
+
 def extract_title_and_question(input_string):
     lines = input_string.strip().split("\n")
 
@@ -27,16 +38,16 @@ def extract_title_and_question(input_string):
 
 
 def create_vector_index(driver, dimension: int) -> None:
-    index_query = "CALL db.index.vector.createNodeIndex('stackoverflow', 'Question', 'embedding', $dimension, 'cosine')"
-    try:
-        driver.query(index_query, {"dimension": dimension})
-    except:  # Already exists
-        pass
-    index_query = "CALL db.index.vector.createNodeIndex('top_answers', 'Answer', 'embedding', $dimension, 'cosine')"
-    try:
-        driver.query(index_query, {"dimension": dimension})
-    except:  # Already exists
-        pass
+    index_query = """
+    CREATE VECTOR INDEX stackoverflow IF NOT EXISTS FOR (m:Question) ON m.embedding
+    OPTIONS {indexConfig: {`vector.dimensions`: $dimension, `vector.similarity_function`: 'cosine'}}
+    """
+    driver.query(index_query, {"dimension": dimension})
+    index_query = """
+    CREATE VECTOR INDEX top_answers IF NOT EXISTS FOR (m:Answer) ON m.embedding
+    OPTIONS {indexConfig: {`vector.dimensions`: $dimension, `vector.similarity_function`: 'cosine'}}
+    """
+    driver.query(index_query, {"dimension": dimension})
 
 
 def create_constraints(driver):
